@@ -70,7 +70,14 @@ impl App {
                 cmd.stdin(std::process::Stdio::inherit())
                     .stderr(std::process::Stdio::inherit())
                     .output()
-                    .expect("Failed to run command")
+                    .expect(&format!(
+                        "Failed to run command `{} {}`",
+                        cmd.get_program().to_string_lossy(),
+                        cmd.get_args()
+                            .map(|arg| arg.to_str().unwrap())
+                            .collect::<Vec<_>>()
+                            .join(" ")
+                    ))
             } else {
                 cmd.output().expect("Failed to run command")
             };
@@ -269,6 +276,25 @@ impl App {
                         HashMap::new()
                     };
 
+                // populate already trusted keys
+                let trusted_output_raw = &self.run_nix(
+                    "nix",
+                    &["config", "show", "trusted-public-keys"],
+                    &no_logging,
+                )?;
+                let trusted_output = String::from_utf8_lossy(&trusted_output_raw.stdout);
+                let already_trusted_keys: HashMap<String, String> = trusted_output
+                    .split_whitespace()
+                    .filter_map(|cache| {
+                        if cache.contains("cachix.org") {
+                            let key = cache.split('.').next().unwrap();
+                            Some((key.to_string(), cache.to_string()))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+
                 let mut caches = CachixCaches {
                     caches: cachix,
                     known_keys,
@@ -278,6 +304,13 @@ impl App {
                 let client = reqwest::blocking::Client::new();
                 for name in caches.caches.pull.iter() {
                     if !caches.known_keys.contains_key(name) {
+                        // first check our already trusted keys
+                        if already_trusted_keys.contains_key(name) {
+                            new_known_keys.insert(name.clone(), already_trusted_keys[name].clone());
+                            self.logger
+                                .debug(&format!("Already trusted key from nix for {}", name));
+                            continue;
+                        }
                         let mut request =
                             client.get(&format!("https://cachix.org/api/v1/cache/{}", name));
                         if let Ok(ret) = env::var("CACHIX_AUTH_TOKEN") {
@@ -303,7 +336,7 @@ impl App {
                 }
 
                 if !caches.caches.pull.is_empty() {
-                    let store = self.run_nix("nix", &["store", "ping", "--json"], &no_logging)?;
+                    let store = self.run_nix("nix", &["store", "info", "--json"], &no_logging)?;
                     let trusted = serde_json::from_slice::<StorePing>(&store.stdout)
                         .expect("Failed to parse JSON")
                         .trusted;
