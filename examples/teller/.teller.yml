@@ -1,0 +1,19 @@
+project: project_name
+opts:
+  stage: development
+
+# remove if you don't like the prompt
+confirm: Are you sure you want to run in {{stage}}?
+
+providers:
+  # uses environment vars to configure
+  # https://github.com/hashicorp/vault/blob/api/v1.0.4/api/client.go#L28
+  hashicorp_vault:
+    env_sync:
+      path: secret/data/{{stage}}/services/billing
+
+  # this will fuse vars with the below .env file
+  # use if you'd like to grab secrets from outside of the project tree
+  dotenv:
+    env_sync:
+      path: ~/billing.env.{{stage}}
