@@ -94,6 +94,7 @@ fn run_tests_in_directory(args: &Args) -> Result<Vec<TestResult>, Box<dyn std::e
                 let options = DevenvOptions {
                     config,
                     devenv_root: Some(cwd.join(path)),
+                    devenv_test_flake: Some(cwd),
                     devenv_dotfile: Some(tmpdir.path().to_path_buf()),
                     ..Default::default()
                 };

@@ -31,6 +31,7 @@ pub struct DevenvOptions {
     pub global_options: Option<cli::GlobalOptions>,
     pub logger: Option<log::Logger>,
     pub devenv_root: Option<PathBuf>,
+    pub devenv_test_flake: Option<PathBuf>,
     pub devenv_dotfile: Option<PathBuf>,
 }
 
@@ -874,7 +875,12 @@ impl Devenv {
             self.devenv_runtime.display(),
             is_testing
         );
-        let flake = FLAKE_TMPL.replace("__DEVENV_VARS__", &vars);
+        let mut flake = FLAKE_TMPL.replace("__DEVENV_VARS__", &vars);
+        if (is_testing) {
+            flake = flake.replace("__DEVENV_FLAKE__", format!("git+file//{}").as_str())
+        } else {
+            flake = flake.replace("__DEVENV_FLAKE__", "github:cachix/devenv") // TODO: find a better place to put/derive this
+        }
         std::fs::write(self.devenv_root.join(DEVENV_FLAKE), flake)
             .expect("Failed to write flake.nix");
 
