@@ -42412,6 +42412,111 @@ null or string
 
 
 
+## onepassword.enable
+
+
+
+Enable the op cli
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` false `
+
+*Declared by:*
+ - [https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix](https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix)
+
+
+
+## onepassword.package
+
+
+
+The op package to use.
+
+
+
+*Type:*
+package
+
+
+
+*Default:*
+` pkgs._1password-cli `
+
+*Declared by:*
+ - [https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix](https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix)
+
+
+
+## onepassword.account
+
+
+
+A specific account to use for signin
+
+
+
+*Type:*
+string
+
+
+
+*Default:*
+` "" `
+
+*Declared by:*
+ - [https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix](https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix)
+
+
+
+## onepassword.envFile
+
+
+
+optional .env file to use to inject secrets
+
+
+
+*Type:*
+string
+
+
+
+*Default:*
+` "" `
+
+*Declared by:*
+ - [https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix](https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix)
+
+
+
+## onepassword.wrapped
+
+
+
+processes/packages to wrap with ` op run `
+
+
+
+*Type:*
+list of string
+
+
+
+*Default:*
+` [ ] `
+
+*Declared by:*
+ - [https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix](https://github.com/cachix/devenv/blob/main/src/modules/integrations/onepassword.nix)
+
+
+
 ## outputs
 
 
