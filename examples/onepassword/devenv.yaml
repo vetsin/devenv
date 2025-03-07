@@ -1,0 +1,4 @@
+inputs:
+  devenv:
+    url: path:../../?dir=src/modules
+allowUnfree: true
